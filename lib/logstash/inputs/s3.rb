@@ -69,7 +69,7 @@ class LogStash::Inputs::S3 < LogStash::Inputs::Base
 
     @logger.info("Registering s3 input", :bucket => @bucket, :region_endpoint => @region_endpoint)
 
-    if @credentials.nil? || credentials.empty?
+    if @credentials.nil? || @credentials.empty?
       @access_key_id = ENV['AWS_ACCESS_KEY_ID']
       @secret_access_key = ENV['AWS_SECRET_ACCESS_KEY']
     elsif @credentials.is_a? Array
