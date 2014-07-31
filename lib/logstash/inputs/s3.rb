@@ -108,11 +108,16 @@ class LogStash::Inputs::S3 < LogStash::Inputs::Base
       @sincedb_path = File.join(ENV["HOME"], ".sincedb_" + Digest::MD5.hexdigest("#{@bucket}+#{@prefix}"))
     end
 
-    s3 = AWS::S3.new(
+    s3_params = {
+      :region => @region_endpoint
+    }
+
+    s3_params.merge!({
       :access_key_id => @access_key_id,
       :secret_access_key => @secret_access_key,
-      :region => @region_endpoint
-    )
+    }) if @access_key_id && @secret_access_key
+
+    s3 = AWS::S3.new(s3_params)
 
     @s3bucket = s3.buckets[@bucket]
 
