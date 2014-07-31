@@ -22,6 +22,7 @@ class LogStash::Inputs::S3 < LogStash::Inputs::Base
   # - As an ["id","secret"] array
   # - As a path to a file containing AWS_ACCESS_KEY_ID=... and AWS_SECRET_ACCESS_KEY=...
   # - In the environment (variables AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY)
+  # - In a EC2 Instance that is assigned a Role no credentials are required
   config :credentials, :validate => :array, :default => nil
 
   # The name of the S3 bucket.
@@ -68,7 +69,7 @@ class LogStash::Inputs::S3 < LogStash::Inputs::Base
 
     @logger.info("Registering s3 input", :bucket => @bucket, :region_endpoint => @region_endpoint)
 
-    if @credentials.nil?
+    if @credentials.nil? || credentials.empty?
       @access_key_id = ENV['AWS_ACCESS_KEY_ID']
       @secret_access_key = ENV['AWS_SECRET_ACCESS_KEY']
     elsif @credentials.is_a? Array
@@ -94,9 +95,6 @@ class LogStash::Inputs::S3 < LogStash::Inputs::Base
       else
         raise ArgumentError.new('Credentials must be of the form "/path/to/file" or ["id", "secret"]')
       end
-    end
-    if @access_key_id.nil? or @secret_access_key.nil?
-      raise ArgumentError.new('Missing AWS credentials')
     end
 
     if @bucket.nil?
